@@ -26,7 +26,16 @@ message PullTaskReply {
     Task task = 1;
 }
 
+message CompleteTaskRequest {
+    int32 task_id = 1;
+    string out_put = 2;
+}
+
+message CompleteTaskReply {
+}
+
 service DateAgent {
     rpc Register(RegisterRequest) returns (RegisterReply) {}
     rpc PullTask(PullTaskRequest) returns (PullTaskReply) {}
+    rpc CompleteTask(CompleteTaskRequest) returns (CompleteTaskReply) {}
 }
