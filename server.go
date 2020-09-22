@@ -2,13 +2,15 @@ package date_agent
 
 import (
 	"context"
+	"net/http"
 
 	pb "github.com/nevercase/date-agent/proto"
 	"k8s.io/klog"
 )
 
 type Server struct {
-	hub *Hub
+	hub  *Hub
+	http *http.Server
 }
 
 func (s *Server) Register(ctx context.Context, req *pb.RegisterRequest) (*pb.RegisterReply, error) {
@@ -33,12 +35,13 @@ func (s *Server) CompleteTask(ctx context.Context, req *pb.CompleteTaskRequest) 
 }
 
 func (s *Server) Close() {
-
 }
 
 func NewServer(grpcAddr string, httpAddr string) *Server {
+	hub := NewHub(10)
 	s := &Server{
-		hub: NewHub(10),
+		hub:  hub,
+		http: InitHttp(httpAddr, hub),
 	}
 	return s
 }
