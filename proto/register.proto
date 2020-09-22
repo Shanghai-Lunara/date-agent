@@ -16,10 +16,11 @@ message RegisterReply {
 
 message Task {
     int32 task_id = 1;
-    string command = 2;
+    repeated string command = 2;
 }
 
 message PullTaskRequest {
+    string hostname = 1;
 }
 
 message PullTaskReply {
@@ -27,8 +28,9 @@ message PullTaskReply {
 }
 
 message CompleteTaskRequest {
-    int32 task_id = 1;
-    string out_put = 2;
+    string hostname = 1;
+    int32 task_id = 2;
+    string out_put = 3;
 }
 
 message CompleteTaskReply {
