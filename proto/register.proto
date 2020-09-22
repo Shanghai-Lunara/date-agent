@@ -1,0 +1,32 @@
+// Protocol for date-agent.
+
+syntax = "proto3";
+
+package dateagent.v1;
+
+import "google/protobuf/timestamp.proto";
+
+message RegisterRequest {
+    string hostname = 1;
+    google.protobuf.Timestamp time = 2;
+}
+
+message RegisterReply {
+}
+
+message Task {
+    int32 task_id = 1;
+    string command = 2;
+}
+
+message PullTaskRequest {
+}
+
+message PullTaskReply {
+    Task task = 1;
+}
+
+service DateAgent {
+    rpc Register(RegisterRequest) returns (RegisterReply) {}
+    rpc PullTask(PullTaskRequest) returns (PullTaskReply) {}
+}
