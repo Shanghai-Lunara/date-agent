@@ -1,12 +1,31 @@
 package date_agent
 
 import (
+	"context"
+	"time"
+
+	pb "github.com/Shanghai-Lunara/date-agent/proto"
+	"github.com/golang/protobuf/ptypes"
+	retry "github.com/grpc-ecosystem/go-grpc-middleware/retry"
+	"google.golang.org/grpc"
+	"google.golang.org/grpc/codes"
+	"google.golang.org/grpc/keepalive"
 	"k8s.io/klog"
 )
+
+var kacp = keepalive.ClientParameters{
+	Time:                10 * time.Second, // send pings every 10 seconds if there is no activity
+	Timeout:             time.Second,      // wait 1 second for ping ack before considering the connection dead
+	PermitWithoutStream: true,             // send pings even without active streams
+}
 
 type Client struct {
 	hostname     string
 	registerAddr string
+
+	currentTaskId int32
+
+	client pb.DateAgentClient
 }
 
 // NewClient returns the pointer of the Client structure
@@ -16,12 +35,61 @@ func NewClient(addr string) *Client {
 		klog.Fatal(err)
 	}
 	c := &Client{
-		hostname:     hostname,
-		registerAddr: addr,
+		hostname:      hostname,
+		registerAddr:  addr,
+		currentTaskId: 0,
 	}
+	opts := []retry.CallOption{
+		retry.WithBackoff(retry.BackoffLinear(100 * time.Millisecond)),
+		retry.WithCodes(codes.NotFound, codes.Aborted),
+	}
+	cc, err := grpc.Dial(addr, grpc.WithInsecure(), grpc.WithUnaryInterceptor(retry.UnaryClientInterceptor(opts...)))
+	if err != nil {
+		klog.Fatal(err)
+	}
+	c.client = pb.NewDateAgentClient(cc)
+	c.register()
+	go c.timer()
 	return c
 }
 
-func (c *Client) Loop() {
+func (c *Client) timer() {
 
+}
+
+func (c *Client) register() {
+	timestamp, err := ptypes.TimestampProto(time.Now())
+	if err != nil {
+		klog.Fatal(err)
+	}
+	if _, err := c.client.Register(
+		context.Background(),
+		&pb.RegisterRequest{Hostname: c.hostname, Time: timestamp},
+		retry.WithMax(3),
+		retry.WithPerRetryTimeout(1*time.Second),
+	); err != nil {
+		klog.V(2).Info(err)
+	}
+}
+
+func (c *Client) pullTask() (err error) {
+	var reply *pb.PullTaskReply
+	if reply, err = c.client.PullTask(
+		context.Background(),
+		&pb.PullTaskRequest{Hostname: c.hostname},
+		retry.WithMax(3),
+		retry.WithPerRetryTimeout(1*time.Second),
+	); err != nil {
+		klog.V(2).Info(err)
+		return err
+	}
+	if reply.Task.TaskId == 0 || c.currentTaskId >= reply.Task.TaskId {
+		return nil
+	}
+	c.currentTaskId = reply.Task.TaskId
+	if len(reply.Task.Command) == 0 {
+		return nil
+	}
+	// todo exec commands
+	return nil
 }
