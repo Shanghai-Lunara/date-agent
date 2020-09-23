@@ -52,6 +52,13 @@ func (s *Server) CompleteTask(ctx context.Context, req *pb.CompleteTaskRequest) 
 }
 
 func (s *Server) Close() {
+	if err := s.http.Shutdown(context.Background()); err != nil {
+		klog.V(2).Info(err)
+	}
+}
+
+func (s *Server) NewTask(commands []string) {
+	s.hub.NewTask(commands)
 }
 
 func NewServer(grpcAddr string, httpAddr string) *Server {
@@ -63,13 +70,18 @@ func NewServer(grpcAddr string, httpAddr string) *Server {
 	svr := grpc.NewServer()
 	lis, err := net.Listen("tcp", grpcAddr)
 	if err != nil {
-		klog.Fatal("Failed to listen on addr:%v", grpcAddr)
+		klog.Fatal("Failed to listen on addr:", grpcAddr)
 	}
 	pb.RegisterDateAgentServer(svr, s)
 	go func() {
 		if err := svr.Serve(lis); err != nil {
 			klog.Fatal(err)
 		}
+	}()
+	go func() {
+		<-time.After(time.Second * 10)
+		klog.Info("new task")
+		s.NewTask([]string{"date"})
 	}()
 	return s
 }

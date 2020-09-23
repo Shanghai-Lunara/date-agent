@@ -3,6 +3,9 @@ package date_agent
 import (
 	"fmt"
 	"sync"
+	"sync/atomic"
+
+	"k8s.io/klog"
 )
 
 const (
@@ -60,12 +63,25 @@ func (h *Hub) PullTask(hostname string) *Task {
 }
 
 func (h *Hub) CompleteTask(hostname string, taskId int32, output string) error {
+	klog.Infof("CompleteTask hostname:%s taskId:%d output:(%s)", hostname, taskId, output)
 	h.taskMu.Lock()
 	defer h.taskMu.Unlock()
 	for _, v := range h.tasks {
 		if v.Id == taskId {
 			v.Result[hostname] = output
+			return nil
 		}
 	}
 	return fmt.Errorf(ErrTaskIdNoExisted)
+}
+
+func (h *Hub) NewTask(commands []string) {
+	h.taskMu.Lock()
+	defer h.taskMu.Unlock()
+	task := &Task{
+		Id:      atomic.AddInt32(&h.taskId, 1),
+		Command: commands,
+		Result:  make(map[string]string, 0),
+	}
+	h.tasks = append(h.tasks, task)
 }

@@ -53,8 +53,20 @@ func NewClient(addr string) *Client {
 	return c
 }
 
-func (c *Client) timer() {
+func (c *Client) Close() {
 
+}
+
+func (c *Client) timer() {
+	tick := time.NewTicker(time.Second * 1)
+	defer tick.Stop()
+	for {
+		select {
+		case <-tick.C:
+			klog.Info("task")
+			_ = c.task()
+		}
+	}
 }
 
 func (c *Client) register() {
@@ -72,7 +84,7 @@ func (c *Client) register() {
 	}
 }
 
-func (c *Client) pullTask() (err error) {
+func (c *Client) task() (err error) {
 	var reply *pb.PullTaskReply
 	if reply, err = c.client.PullTask(
 		context.Background(),
@@ -83,6 +95,7 @@ func (c *Client) pullTask() (err error) {
 		klog.V(2).Info(err)
 		return err
 	}
+	klog.Info("reply:", reply)
 	if reply.Task.TaskId == 0 || c.currentTaskId >= reply.Task.TaskId {
 		return nil
 	}
@@ -90,6 +103,19 @@ func (c *Client) pullTask() (err error) {
 	if len(reply.Task.Command) == 0 {
 		return nil
 	}
-	// todo exec commands
+	var out string
+	if out, err = Exec(reply.Task.Command); err != nil {
+		klog.V(2).Info(err)
+		return err
+	}
+	if _, err = c.client.CompleteTask(
+		context.Background(),
+		&pb.CompleteTaskRequest{Hostname: c.hostname, TaskId: reply.Task.TaskId, OutPut: out},
+		retry.WithMax(3),
+		retry.WithPerRetryTimeout(1*time.Second),
+	); err != nil {
+		klog.V(2).Info(err)
+		return err
+	}
 	return nil
 }
