@@ -1,0 +1,14 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>{{.title}}</title>
+</head>
+<body>
+{{ range $index, $name := .value}}
+<p>HostName: {{ $name.Hostname }}<p>
+<p>Status: {{ $name.Status }}<p>
+<p>Time: {{ $name.Time }}<p>
+{{end}}
+</body>
+</html>

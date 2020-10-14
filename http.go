@@ -2,7 +2,9 @@ package date_agent
 
 import (
 	"fmt"
+	"io"
 	"net/http"
+	"os"
 	"strings"
 
 	"github.com/gin-gonic/gin"
@@ -43,12 +45,25 @@ func header() gin.HandlerFunc {
 }
 
 func InitHttp(addr string, hub *Hub) *http.Server {
-	router := gin.New()
+	f, _ := os.Create("gin.log")
+	gin.DefaultWriter = io.MultiWriter(f, os.Stdout)
+
+	router := gin.Default()
 	//router.Use(gin.LoggerWithConfig(gin.LoggerConfig{Output: writer}), gin.RecoveryWithWriter(writer))
 	router.Use(header())
+	router.LoadHTMLGlob("templates/*")
 	router.GET("/hello", func(c *gin.Context) {
 		// todo handle request and return data by hub
 		c.JSON(http.StatusOK, "hello world")
+	})
+
+	router.GET("/test", func(c *gin.Context) {
+		c.HTML(http.StatusOK, "test.tmpl", gin.H{
+			"title": "test",
+			"value": hub.nodes,
+		})
+
+		fmt.Printf("%+v\n", hub.nodes)
 	})
 	server := &http.Server{
 		Addr:    addr,
