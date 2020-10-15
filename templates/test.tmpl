@@ -10,5 +10,10 @@
 <p>Status: {{ $name.Status }}<p>
 <p>Time: {{ $name.Time }}<p>
 {{end}}
+
+<form method="post" action="changeTime">
+    <input type="text" name="test"> 名称
+    <button>提交</button>
+</form>
 </body>
 </html>

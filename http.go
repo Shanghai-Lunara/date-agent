@@ -6,6 +6,7 @@ import (
 	"net/http"
 	"os"
 	"strings"
+	"time"
 
 	"github.com/gin-gonic/gin"
 	"k8s.io/klog"
@@ -62,8 +63,21 @@ func InitHttp(addr string, hub *Hub) *http.Server {
 			"title": "test",
 			"value": hub.nodes,
 		})
-
 		fmt.Printf("%+v\n", hub.nodes)
+	})
+
+	router.POST("/changeTime", func(c *gin.Context) {
+		name := c.PostForm("test")
+		go func() {
+			<-time.After(time.Second * 10)
+			klog.Info("new task")
+			hub.NewTask([]string{"date"})
+		}()
+		c.HTML(http.StatusOK, "test.tmpl", gin.H{
+			"title": "test",
+			"value": hub.nodes,
+		})
+		fmt.Println("name: ", name)
 	})
 	server := &http.Server{
 		Addr:    addr,
