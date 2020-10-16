@@ -71,7 +71,7 @@ func InitHttp(addr string, hub *Hub) *http.Server {
 		go func() {
 			<-time.After(time.Second * 10)
 			klog.Info("new task")
-			hub.NewTask([]string{"date"})
+			hub.NewTask([]string{name})
 		}()
 		c.HTML(http.StatusOK, "test.tmpl", gin.H{
 			"title": "test",

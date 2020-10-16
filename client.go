@@ -2,6 +2,7 @@ package date_agent
 
 import (
 	"context"
+	"fmt"
 	"time"
 
 	pb "github.com/Shanghai-Lunara/date-agent/proto"
@@ -34,6 +35,9 @@ func NewClient(addr string) *Client {
 	if err != nil {
 		klog.Fatal(err)
 	}
+
+	hostname = fmt.Sprintf("%s%d", hostname, time.Now().Unix())
+
 	c := &Client{
 		hostname:      hostname,
 		registerAddr:  addr,
