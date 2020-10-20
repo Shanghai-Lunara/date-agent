@@ -90,6 +90,8 @@ func (c *Client) register() {
 
 func (c *Client) task() (err error) {
 	var reply *pb.PullTaskReply
+	fmt.Println(c.hostname)
+
 	if reply, err = c.client.PullTask(
 		context.Background(),
 		&pb.PullTaskRequest{Hostname: c.hostname},

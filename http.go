@@ -2,14 +2,12 @@ package date_agent
 
 import (
 	"fmt"
+	"github.com/gin-gonic/gin"
 	"io"
+	"k8s.io/klog"
 	"net/http"
 	"os"
 	"strings"
-	"time"
-
-	"github.com/gin-gonic/gin"
-	"k8s.io/klog"
 )
 
 func header() gin.HandlerFunc {
@@ -53,32 +51,35 @@ func InitHttp(addr string, hub *Hub) *http.Server {
 	//router.Use(gin.LoggerWithConfig(gin.LoggerConfig{Output: writer}), gin.RecoveryWithWriter(writer))
 	router.Use(header())
 	router.LoadHTMLGlob("templates/*")
+	router.StaticFS("/statics", http.Dir("./statics"))
 	router.GET("/hello", func(c *gin.Context) {
 		// todo handle request and return data by hub
-		c.JSON(http.StatusOK, "hello world")
+		c.JSON(http.StatusOK, hub.nodes)
 	})
 
-	router.GET("/test", func(c *gin.Context) {
-		c.HTML(http.StatusOK, "test.tmpl", gin.H{
-			"title": "test",
-			"value": hub.nodes,
-		})
-		fmt.Printf("%+v\n", hub.nodes)
+	router.GET("/getJobs", func(c *gin.Context) {
+		c.JSONP(http.StatusOK, hub.nodes)
 	})
 
 	router.POST("/changeTime", func(c *gin.Context) {
-		name := c.PostForm("test")
+		//name := c.PostForm("hostname")
+		command := c.PostForm("command")
 		go func() {
-			<-time.After(time.Second * 10)
+			//<-time.After(time.Second * 10)
 			klog.Info("new task")
-			hub.NewTask([]string{name})
+			hub.NewTask([]string{command})
 		}()
-		c.HTML(http.StatusOK, "test.tmpl", gin.H{
+		c.JSONP(http.StatusOK, hub.nodes)
+	})
+
+	router.GET("/index", func(c *gin.Context) {
+		c.HTML(http.StatusOK, "index.tmpl", gin.H{
 			"title": "test",
 			"value": hub.nodes,
 		})
-		fmt.Println("name: ", name)
+		fmt.Printf("%+v\n", &hub.nodes)
 	})
+
 	server := &http.Server{
 		Addr:    addr,
 		Handler: router,
