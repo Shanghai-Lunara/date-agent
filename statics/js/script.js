@@ -39,10 +39,13 @@ var app = {
     del: $('#del')[0],
     save: $('#save')[0],
     jobs: $('#body table tbody')[0],
+    logs: $('#log')[0],
     modalModify: $('#modify')[0],
     inputs: $('.body form input, .body form select'),
     editing: undefined,
+    taskId: 0,
     init: function () {
+        app.getResponse();
         //Buttons
         app.getJobs();
         // app.new.on('click', app.newJob);
@@ -67,7 +70,6 @@ var app = {
                <tr class='jobrow' id='${jobID}'>
                   <td>${job.hostname}</td>
                   <td>${job.status}</td>
-                  <td>${job.time}</td>
                </tr>`;
             app.jobs.innerHTML += template;
         });
@@ -132,18 +134,55 @@ var app = {
         xhr.onreadystatechange = function () {
             if (xhr.readyState == 4) { // 读取完成
                 if (xhr.status == 200) {
-                    data.rows = []
+                    console.log(url)
                     console.log(xhr.responseText);
-                    Object.keys(JSON.parse(xhr.responseText)).forEach(function (key) {
-                        console.log(key, JSON.parse(xhr.responseText)[key]);
-                        data.rows.push(JSON.parse(xhr.responseText)[key]);
-                    })
-                    console.log(data.rows);
-                    app.loadJobs();
+                    if (url != '/getHub') {
+                        data.rows = []
+                        Object.keys(JSON.parse(xhr.responseText)).forEach(function (key) {
+                            console.log(key, JSON.parse(xhr.responseText)[key]);
+                            data.rows.push(JSON.parse(xhr.responseText)[key]);
+                        })
+                        console.log(data.rows);
+                        app.loadJobs();
+                    } else {
+                        Object.keys(JSON.parse(xhr.responseText)).forEach(function (key) {
+                            console.log(key, JSON.parse(xhr.responseText)[key]);
+                            let tmp = JSON.parse(xhr.responseText)[key]
+                            if (tmp.id > app.taskId) {
+                                app.taskId = tmp.id
+                                let template = '';
+
+                                Object.keys(tmp.result).forEach(function (key) {
+                                    template += `
+                                    <p>[${app.getDate()}]  ${tmp.result[key]}</p>
+                                    `;
+                                    console.log(template);
+                                })
+                                console.log(template);
+                                app.logs.innerHTML += template;
+                            }
+                        })
+                    }
                 }
             }
         }
+    },
+    getResponse: function () {
+        setInterval(function () {
+            app.ajax('post', '/getHub')
+        }, 3000);
+    },
+    getDate: function () {
+        var date = new Date(new Date().getTime());//如果date为13位不需要乘1000
+        var Y = date.getFullYear() + '-';
+        var M = (date.getMonth()+1 < 10 ? '0'+(date.getMonth()+1) : date.getMonth()+1) + '-';
+        var D = (date.getDate() < 10 ? '0' + (date.getDate()) : date.getDate()) + ' ';
+        var h = (date.getHours() < 10 ? '0' + date.getHours() : date.getHours()) + ':';
+        var m = (date.getMinutes() <10 ? '0' + date.getMinutes() : date.getMinutes()) + ':';
+        var s = (date.getSeconds() <10 ? '0' + date.getSeconds() : date.getSeconds());
+        return Y+M+D+h+m+s;
     }
+
 }
 
 app.init();

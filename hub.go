@@ -58,7 +58,9 @@ func (h *Hub) PullTask(hostname string) *Task {
 	if taskNum == 0 {
 		return &Task{Id: 0, Command: make([]string, 0)}
 	}
-	h.tasks[taskNum-1].Result[hostname] = "wait output"
+	if h.tasks[taskNum-1].Result[hostname] == "" {
+		h.tasks[taskNum-1].Result[hostname] = "wait output"
+	}
 	return h.tasks[taskNum-1]
 }
 
@@ -66,9 +68,10 @@ func (h *Hub) CompleteTask(hostname string, taskId int32, output string) error {
 	klog.Infof("CompleteTask hostname:%s taskId:%d output:(%s)", hostname, taskId, output)
 	h.taskMu.Lock()
 	defer h.taskMu.Unlock()
-	for _, v := range h.tasks {
+	klog.Info(h.tasks)
+	for i, v := range h.tasks {
 		if v.Id == taskId {
-			v.Result[hostname] = output
+			h.tasks[i].Result[hostname] = output
 			return nil
 		}
 	}

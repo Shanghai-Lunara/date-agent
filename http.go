@@ -72,12 +72,16 @@ func InitHttp(addr string, hub *Hub) *http.Server {
 		c.JSONP(http.StatusOK, hub.nodes)
 	})
 
+	router.POST("/getHub", func(c *gin.Context) {
+		c.JSONP(http.StatusOK, hub.tasks)
+	})
+
 	router.GET("/index", func(c *gin.Context) {
 		c.HTML(http.StatusOK, "index.tmpl", gin.H{
 			"title": "test",
 			"value": hub.nodes,
 		})
-		fmt.Printf("%+v\n", &hub.nodes)
+		fmt.Printf("%+v\n", hub)
 	})
 
 	server := &http.Server{
