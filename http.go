@@ -54,11 +54,18 @@ func InitHttp(addr string, hub *Hub) *http.Server {
 	router.StaticFS("/statics", http.Dir("./statics"))
 	router.GET("/hello", func(c *gin.Context) {
 		// todo handle request and return data by hub
-		c.JSON(http.StatusOK, hub.nodes)
+		for index, value := range hub.tasks {
+			fmt.Println("taskId", hub.taskId)
+			fmt.Printf("%+v\n", index)
+			fmt.Printf("%+v\n", value)
+		}
+		fmt.Println("hub.ret", hub.ret)
+		c.JSON(http.StatusOK, hub.ret)
 	})
 
 	router.GET("/getJobs", func(c *gin.Context) {
-		c.JSONP(http.StatusOK, hub.nodes)
+		fmt.Printf("%+v\n", hub)
+		c.JSON(http.StatusOK, hub.ret)
 	})
 
 	router.POST("/changeTime", func(c *gin.Context) {
@@ -69,19 +76,19 @@ func InitHttp(addr string, hub *Hub) *http.Server {
 			klog.Info("new task")
 			hub.NewTask([]string{command})
 		}()
-		c.JSONP(http.StatusOK, hub.nodes)
+		c.JSON(http.StatusOK, hub.ret)
 	})
 
 	router.POST("/getHub", func(c *gin.Context) {
-		c.JSONP(http.StatusOK, hub.tasks)
+		var l int
+		if len(hub.tasks) > 5 {
+			l = len(hub.tasks) - 5
+		}
+		c.JSONP(http.StatusOK, gin.H{"tasks": hub.tasks[l:], "ret": hub.ret})
 	})
 
 	router.GET("/index", func(c *gin.Context) {
-		c.HTML(http.StatusOK, "index.tmpl", gin.H{
-			"title": "test",
-			"value": hub.nodes,
-		})
-		fmt.Printf("%+v\n", hub)
+		c.HTML(http.StatusOK, "index.tmpl", gin.H{})
 	})
 
 	server := &http.Server{

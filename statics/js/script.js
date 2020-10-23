@@ -38,10 +38,13 @@ var app = {
     close: $('#close')[0],
     del: $('#del')[0],
     save: $('#save')[0],
+    reset: $('#reset')[0],
     jobs: $('#body table tbody')[0],
     logs: $('#log')[0],
     modalModify: $('#modify')[0],
-    inputs: $('.body form input, .body form select'),
+    inputs: $('.body form input, .body form select, .test input'),
+    change: $('.change input')[0],
+    resetValue: $('.reset input')[0],
     editing: undefined,
     taskId: 0,
     init: function () {
@@ -50,7 +53,8 @@ var app = {
         app.getJobs();
         // app.new.on('click', app.newJob);
         app.close.on('click', app.closeModify);
-        app.save.on('click', app.saveJob);
+        app.save.on('click', app.changeCommand);
+        app.reset.on('click', app.resetCommand);
         // app.del.on('click', app.delJob);
 
         app.closeModify();
@@ -69,15 +73,11 @@ var app = {
             var template = `
                <tr class='jobrow' id='${jobID}'>
                   <td>${job.hostname}</td>
-                  <td>${job.status}</td>
+                  <td>${job.taskId}</td>
+                  <td>${job.output}</td>
                </tr>`;
             app.jobs.innerHTML += template;
         });
-        const rows = $('.jobrow');
-        const len = rows.length || 1;
-        for (let i = 0; i < rows.length; i++) {
-            rows[i].on('click', app.openJob);
-        }
     },
     openJob: function () {
         app.editing = this.id.split('_')[1];
@@ -86,6 +86,8 @@ var app = {
         }*/
         app.openModify();
     },
+    changeCommand: function(){app.saveJob(app.change.value)},
+    resetCommand: function() {app.saveJob(app.resetValue.value)},
     /*newJob: function(){
        for(var i = 0; i < app.inputs.length; i++){
           app.inputs[i].value = "";
@@ -95,16 +97,13 @@ var app = {
        app.data.id += 1;
        app.openModify();
     },*/
-    saveJob: function () {
-        for (let i = 0; i < app.inputs.length; i++) {
-            // editing[app.inputs[i].getAttribute('name')] = app.inputs[i].value;
-            let body = 'hostname=' + app.data.rows[app.editing]['hostname'] + '&command=' + app.inputs[i].value
-            app.ajax('post', '/changeTime', body)
-            console.log(app.inputs[i].value);
-            console.log(app.data.rows[app.editing]['hostname']);
-        }
+    saveJob: function (request) {
+        // editing[app.inputs[i].getAttribute('name')] = app.inputs[i].value;
+        // let body = 'hostname=' + app.data.rows[app.editing]['hostname'] + '&command=' + app.inputs[i].value
+        let body = 'command=' + request
+        app.ajax('post', '/changeTime', body)
         // app.data.rows[app.getJobIndex(app.editing)] = editing;
-        app.closeModify();
+        // app.closeModify();
     },
     /*delJob: function(){
        app.data.rows.splice(app.editing, 1);
@@ -127,42 +126,36 @@ var app = {
         if (method == 'post') {
             xhr.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
         }
-        console.log(body);
         xhr.send(body);
 
-        app.loadJobs();
         xhr.onreadystatechange = function () {
             if (xhr.readyState == 4) { // 读取完成
                 if (xhr.status == 200) {
-                    console.log(url)
-                    console.log(xhr.responseText);
-                    if (url != '/getHub') {
-                        data.rows = []
-                        Object.keys(JSON.parse(xhr.responseText)).forEach(function (key) {
-                            console.log(key, JSON.parse(xhr.responseText)[key]);
-                            data.rows.push(JSON.parse(xhr.responseText)[key]);
-                        })
-                        console.log(data.rows);
-                        app.loadJobs();
-                    } else {
-                        Object.keys(JSON.parse(xhr.responseText)).forEach(function (key) {
-                            console.log(key, JSON.parse(xhr.responseText)[key]);
-                            let tmp = JSON.parse(xhr.responseText)[key]
-                            if (tmp.id > app.taskId) {
+                    console.log(JSON.parse(xhr.responseText));
+                    const ret = JSON.parse(xhr.responseText).ret;
+                    const tasks = JSON.parse(xhr.responseText).tasks;
+                    if (url == '/getHub') {
+                        let template = '';
+                        Object.keys(tasks).forEach(function (key) {
+                            let tmp = tasks[key]
                                 app.taskId = tmp.id
-                                let template = '';
-
-                                Object.keys(tmp.result).forEach(function (key) {
-                                    template += `
-                                    <p>[${app.getDate()}]  ${tmp.result[key]}</p>
-                                    `;
-                                    console.log(template);
-                                })
-                                console.log(template);
-                                app.logs.innerHTML += template;
-                            }
+                                template += `
+                                <p>[TaskId:  ${tmp.id}] <label style="color: brown">Command:</label>     ${tmp.command} </p>
+                                `;
+                                app.logs.innerHTML = template;
                         })
                     }
+
+                    data.rows = []
+                    Object.keys(ret).forEach(function (key) {
+                        let tmp = {
+                            hostname: key,
+                            taskId: ret[key]['task_id'],
+                            output: ret[key]['output']
+                        };
+                        data.rows.push(tmp);
+                    })
+                    app.loadJobs();
                 }
             }
         }
@@ -170,17 +163,17 @@ var app = {
     getResponse: function () {
         setInterval(function () {
             app.ajax('post', '/getHub')
-        }, 3000);
+        }, 200);
     },
     getDate: function () {
         var date = new Date(new Date().getTime());//如果date为13位不需要乘1000
         var Y = date.getFullYear() + '-';
-        var M = (date.getMonth()+1 < 10 ? '0'+(date.getMonth()+1) : date.getMonth()+1) + '-';
+        var M = (date.getMonth() + 1 < 10 ? '0' + (date.getMonth() + 1) : date.getMonth() + 1) + '-';
         var D = (date.getDate() < 10 ? '0' + (date.getDate()) : date.getDate()) + ' ';
         var h = (date.getHours() < 10 ? '0' + date.getHours() : date.getHours()) + ':';
-        var m = (date.getMinutes() <10 ? '0' + date.getMinutes() : date.getMinutes()) + ':';
-        var s = (date.getSeconds() <10 ? '0' + date.getSeconds() : date.getSeconds());
-        return Y+M+D+h+m+s;
+        var m = (date.getMinutes() < 10 ? '0' + date.getMinutes() : date.getMinutes()) + ':';
+        var s = (date.getSeconds() < 10 ? '0' + date.getSeconds() : date.getSeconds());
+        return Y + M + D + h + m + s;
     }
 
 }

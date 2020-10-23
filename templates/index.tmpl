@@ -11,13 +11,24 @@
 <!-- partial:index.partial.html -->
 
 <div class="container">
-  <div class="header">Cron Job Manager</div>
+  <div class="header">Date-agent</div>
+  <div class="header" style="height: auto">
+    <div class="test">
+      <label class="change">输入指令:  <input type="text" name="name" style="margin-left: 5px"/>
+        <button id="save" style="float:right;">Change</button>
+      </label>
+      <label class="reset">还原指令:  <input type="text" name="name" value="ntpdate cn.pool.ntp.org" style="margin-left: 5px"/>
+        <button class="bg-red" style="float:right;" id="reset">Reset</button>
+      </label>
+    </div>
+  </div>
   <div id="body">
     <table>
       <thead>
         <tr>
-          <th width="70%">HostName</th>
-          <th width="30%">Status</th>
+          <th width="20%">HostName</th>
+          <th width="10%">TaskId</th>
+          <th width="70%">OutPut</th>
         </tr>
       </thead>
       <tbody>
@@ -31,7 +42,7 @@
     <div class="header">Modifying:
       <button class="bg-grey" id="close" style="float:right;">Close</button>
       <!--<button class="bg-red" id="del" style="float:right;">Del</button>-->
-      <button id="save" style="float:right;">Save</button>
+      <!--<button id="save" style="float:right;">Save</button>-->
     </div>
     <div class="body">
       <form>

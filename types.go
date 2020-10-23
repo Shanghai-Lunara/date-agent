@@ -20,5 +20,10 @@ type Task struct {
 	Id       int32             `json:"id"`
 	Command  []string          `json:"command"`
 	Result   map[string]string `json:"result"`
-	hostname string
 }
+
+type Return struct{
+	TaskId int32 `json:"task_id"`
+	Output string `json:"output"`
+}
+
