@@ -2,10 +2,9 @@ package date_agent
 
 import (
 	"fmt"
+	"k8s.io/klog/v2"
 	"sync"
 	"sync/atomic"
-
-	"k8s.io/klog"
 )
 
 const (

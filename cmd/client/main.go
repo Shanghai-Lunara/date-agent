@@ -2,10 +2,9 @@ package main
 
 import (
 	"flag"
-
 	agent "github.com/Shanghai-Lunara/date-agent"
 	"github.com/nevercase/k8s-controller-custom-resource/pkg/signals"
-	"k8s.io/klog"
+	"k8s.io/klog/v2"
 )
 
 var (

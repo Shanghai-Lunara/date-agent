@@ -2,11 +2,10 @@ package date_agent
 
 import (
 	"fmt"
+	"k8s.io/klog/v2"
 	"os"
 	"os/exec"
 	"strings"
-
-	"k8s.io/klog"
 )
 
 // getHostName : get the hostname of the host machine if the container is started by docker run --net=host

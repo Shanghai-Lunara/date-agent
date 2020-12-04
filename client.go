@@ -2,15 +2,14 @@ package date_agent
 
 import (
 	"context"
-	"time"
-
 	pb "github.com/Shanghai-Lunara/date-agent/proto"
 	"github.com/golang/protobuf/ptypes"
 	retry "github.com/grpc-ecosystem/go-grpc-middleware/retry"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/keepalive"
-	"k8s.io/klog"
+	"k8s.io/klog/v2"
+	"time"
 )
 
 var kacp = keepalive.ClientParameters{

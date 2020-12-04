@@ -2,14 +2,13 @@ package date_agent
 
 import (
 	"context"
-	"net"
-	"net/http"
-	"time"
-
 	pb "github.com/Shanghai-Lunara/date-agent/proto"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/keepalive"
-	"k8s.io/klog"
+	"k8s.io/klog/v2"
+	"net"
+	"net/http"
+	"time"
 )
 
 var kaep = keepalive.EnforcementPolicy{

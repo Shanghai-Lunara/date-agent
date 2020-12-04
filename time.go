@@ -2,10 +2,9 @@ package date_agent
 
 import (
 	"context"
+	"k8s.io/klog/v2"
 	"os/exec"
 	"time"
-
-	"k8s.io/klog"
 )
 
 func Exec(suffix []string) (out string, err error) {
