@@ -25,6 +25,7 @@ var kasp = keepalive.ServerParameters{
 }
 
 type Server struct {
+	ret  *Return
 	hub  *Hub
 	http *http.Server
 }
@@ -78,7 +79,6 @@ func NewServer(grpcAddr string, httpAddr string) *Server {
 		}
 	}()
 	go func() {
-		<-time.After(time.Second * 10)
 		klog.Info("new task")
 		s.NewTask([]string{"date"})
 	}()

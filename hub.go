@@ -20,6 +20,7 @@ type Hub struct {
 	taskId       int32
 	maxTaskCount int
 	tasks        []*Task
+	ret          map[string]*Return
 }
 
 func NewNode(hostname string) *Node {
@@ -35,6 +36,7 @@ func NewHub(max int) *Hub {
 		taskId:       0,
 		maxTaskCount: max,
 		tasks:        make([]*Task, 0),
+		ret:          make(map[string]*Return, 0),
 	}
 }
 
@@ -57,7 +59,9 @@ func (h *Hub) PullTask(hostname string) *Task {
 	if taskNum == 0 {
 		return &Task{Id: 0, Command: make([]string, 0)}
 	}
-	h.tasks[taskNum-1].Result[hostname] = "wait output"
+	if h.tasks[taskNum-1].Result[hostname] == "" {
+		h.tasks[taskNum-1].Result[hostname] = "wait output"
+	}
 	return h.tasks[taskNum-1]
 }
 
@@ -65,9 +69,16 @@ func (h *Hub) CompleteTask(hostname string, taskId int32, output string) error {
 	klog.Infof("CompleteTask hostname:%s taskId:%d output:(%s)", hostname, taskId, output)
 	h.taskMu.Lock()
 	defer h.taskMu.Unlock()
-	for _, v := range h.tasks {
+	for i, v := range h.tasks {
 		if v.Id == taskId {
-			v.Result[hostname] = output
+			h.tasks[i].Result[hostname] = output
+		}
+
+		if taskId >= v.Id {
+			h.ret[hostname] = &Return{
+				TaskId: taskId,
+				Output: output,
+			}
 			return nil
 		}
 	}
