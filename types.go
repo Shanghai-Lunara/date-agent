@@ -17,7 +17,8 @@ type Node struct {
 }
 
 type Task struct {
-	Id      int32             `json:"id"`
-	Command []string          `json:"command"`
-	Result  map[string]string `json:"result"`
+	Id       int32             `json:"id"`
+	Command  []string          `json:"command"`
+	Result   map[string]string `json:"result"`
+	hostname string
 }

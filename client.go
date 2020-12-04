@@ -2,6 +2,7 @@ package date_agent
 
 import (
 	"context"
+	"fmt"
 	pb "github.com/Shanghai-Lunara/date-agent/proto"
 	"github.com/golang/protobuf/ptypes"
 	retry "github.com/grpc-ecosystem/go-grpc-middleware/retry"
@@ -33,6 +34,9 @@ func NewClient(addr string) *Client {
 	if err != nil {
 		klog.Fatal(err)
 	}
+
+	hostname = fmt.Sprintf("%s%d", hostname, time.Now().Unix())
+
 	c := &Client{
 		hostname:      hostname,
 		registerAddr:  addr,
@@ -85,6 +89,8 @@ func (c *Client) register() {
 
 func (c *Client) task() (err error) {
 	var reply *pb.PullTaskReply
+	fmt.Println(c.hostname)
+
 	if reply, err = c.client.PullTask(
 		context.Background(),
 		&pb.PullTaskRequest{Hostname: c.hostname},
@@ -94,7 +100,7 @@ func (c *Client) task() (err error) {
 		klog.V(2).Info(err)
 		return err
 	}
-	klog.Info("reply:", reply)
+	klog.V(3).Info("reply:", reply)
 	if reply.Task.TaskId == 0 || c.currentTaskId >= reply.Task.TaskId {
 		return nil
 	}

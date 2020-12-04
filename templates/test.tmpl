@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>{{.title}}</title>
+</head>
+<body>
+{{ range $index, $name := .value}}
+<p>{{ $name }}</p>
+<p>HostName: {{ $name.Hostname }}<p>
+<p>Status: {{ $name.Status }}<p>
+<p>Time: {{ $name.Time }}<p>
+{{end}}
+<p>{{.value}}</p>
+
+<form method="post" action="changeTime">
+    <input type="text" name="test"> 名称
+    <button>提交</button>
+</form>
+</body>
+</html>

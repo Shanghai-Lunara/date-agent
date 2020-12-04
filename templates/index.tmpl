@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en" >
+<head>
+  <meta charset="UTF-8">
+  <title>Front End Day 27 - Cron Job Manager</title>
+  <link rel='stylesheet' href='/statics/css/css.css?family=Ubuntu'>
+<link rel='stylesheet' href='/statics/css/icon.css?family=Material+Icons'>
+<link rel="stylesheet" href="/statics/css/style.css">
+</head>
+<body>
+<!-- partial:index.partial.html -->
+
+<div class="container">
+  <div class="header">Cron Job Manager</div>
+  <div id="body">
+    <table>
+      <thead>
+        <tr>
+          <th>HostName</th>
+          <th>Status</th>
+          <th>Time</th>
+        </tr>
+      </thead>
+      <tbody>
+      </tbody>
+    </table>
+  </div>
+  <div class="footer">
+    <!--<button id="new" style="float:right;">New</button>-->
+  </div>
+  <div class="modal close" id="modify">
+    <div class="header">Modifying:
+      <button class="bg-grey" id="close" style="float:right;">Close</button>
+      <!--<button class="bg-red" id="del" style="float:right;">Del</button>-->
+      <button id="save" style="float:right;">Save</button>
+    </div>
+    <div class="body">
+      <form>
+        <!--<label>Name:
+          <input type="text" name="name" hidden/>
+        </label>
+        <label>Path:
+          <input type="text" name="path"/>
+        </label>
+        <label>Start Date and Time:
+          <div style="clear:both;">
+            <input type="date" name="startDate"/>
+            <input type="time" name="startTime"/>
+          </div>
+        </label>
+        <label>End Date and Time:
+          <div style="clear:both;">
+            <input type="date" name="endDate"/>
+            <input type="time" name="endTime"/>
+          </div>
+        </label>
+        <label>How often should it run
+          <select name="interval">
+            <option>Daily</option>
+            <option>Weekly</option>
+            <option>Monthly</option>
+            <option>Yearly</option>
+          </select>
+        </label>
+        <label>On that day repeat every (blank = no repeat)
+          <input type="time" name="repeatEvery" style="display:block; float:none; margin-left:0px;"/>
+        </label>
+        <label>Day Numbers:
+          <input type="text" name="days"/>
+        </label>-->
+        <label>输入指令:
+          <input type="text" name="weeks"/>
+        </label>
+      </form>
+    </div>
+  </div>
+</div>
+<!-- partial -->
+  <script  src="/statics/js/script.js"></script>
+</body>
+</html>
