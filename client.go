@@ -10,6 +10,7 @@ import (
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/keepalive"
 	"k8s.io/klog/v2"
+	"sync"
 	"time"
 )
 
@@ -26,21 +27,27 @@ type Client struct {
 	currentTaskId int32
 
 	client pb.DateAgentClient
+
+	ctx    context.Context
+	cancel context.CancelFunc
+	once   sync.Once
 }
 
 // NewClient returns the pointer of the Client structure
-func NewClient(addr string) *Client {
+func NewClient(addr string) (*Client, error) {
 	hostname, err := GetHostName()
 	if err != nil {
 		klog.Fatal(err)
 	}
 
 	hostname = fmt.Sprintf("%s%d", hostname, time.Now().Unix())
-
+	ctx, cancel := context.WithCancel(context.Background())
 	c := &Client{
 		hostname:      hostname,
 		registerAddr:  addr,
 		currentTaskId: 0,
+		ctx:           ctx,
+		cancel:        cancel,
 	}
 	opts := []retry.CallOption{
 		retry.WithBackoff(retry.BackoffLinear(100 * time.Millisecond)),
@@ -48,26 +55,38 @@ func NewClient(addr string) *Client {
 	}
 	cc, err := grpc.Dial(addr, grpc.WithInsecure(), grpc.WithUnaryInterceptor(retry.UnaryClientInterceptor(opts...)))
 	if err != nil {
-		klog.Fatal(err)
+		klog.V(2).Info(err)
+		return nil, err
 	}
 	c.client = pb.NewDateAgentClient(cc)
 	c.register()
 	go c.timer()
-	return c
+	return c, nil
 }
 
 func (c *Client) Close() {
+	c.once.Do(func() {
+		c.cancel()
+	})
+}
 
+func (c *Client) DoneSignal() <-chan struct{} {
+	return c.ctx.Done()
 }
 
 func (c *Client) timer() {
+	defer c.Close()
 	tick := time.NewTicker(time.Second * 1)
 	defer tick.Stop()
 	for {
 		select {
 		case <-tick.C:
 			klog.Info("task")
-			_ = c.task()
+			if err := c.task(); err != nil {
+				return
+			}
+		case <-c.ctx.Done():
+			return
 		}
 	}
 }

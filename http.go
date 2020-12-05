@@ -4,17 +4,12 @@ import (
 	"fmt"
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
-	"io"
 	"k8s.io/klog/v2"
 	"net/http"
-	"os"
 )
 
 func InitHttp(addr string, hub *Hub) *http.Server {
-	f, _ := os.Create("gin.log")
-	gin.DefaultWriter = io.MultiWriter(f, os.Stdout)
-
-	router := gin.Default()
+	router := gin.New()
 	//router.Use(gin.LoggerWithConfig(gin.LoggerConfig{Output: writer}), gin.RecoveryWithWriter(writer))
 	router.Use(cors.Default())
 	router.LoadHTMLGlob("templates/*")

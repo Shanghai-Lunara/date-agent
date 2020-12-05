@@ -1,6 +1,6 @@
 module github.com/Shanghai-Lunara/date-agent
 
-go 1.14
+go 1.15
 
 require (
 	github.com/gin-contrib/cors v1.3.1

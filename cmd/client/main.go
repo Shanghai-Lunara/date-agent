@@ -20,7 +20,10 @@ func main() {
 	flag.Parse()
 	// set up signals so we handle the first shutdown signal gracefully
 	stopCh := signals.SetupSignalHandler()
-	client := agent.NewClient(grpcservice)
+	client, err := agent.NewClient(grpcservice)
+	if err != nil {
+		klog.Fatal(err)
+	}
 	<-stopCh
 	client.Close()
 }
