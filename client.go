@@ -81,7 +81,6 @@ func (c *Client) timer() {
 	for {
 		select {
 		case <-tick.C:
-			klog.Info("task")
 			if err := c.task(); err != nil {
 				return
 			}
