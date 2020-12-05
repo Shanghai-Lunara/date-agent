@@ -27,3 +27,6 @@ client:
 os:
 	go run cmd/client-env-retry/main.go -v=4
 
+build-client:
+	CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -o date-agent-client cmd/client-env-retry/main.go
+
