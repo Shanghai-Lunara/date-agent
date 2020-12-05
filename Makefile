@@ -1,5 +1,16 @@
 .PHONY: proto register client
 
+HARBOR_DOMAIN := $(shell echo ${HARBOR})
+PROJECT := lunara-common
+SERVER_IMAGE := "$(HARBOR_DOMAIN)/$(PROJECT)/date-agent:latest"
+
+build:
+	-i docker image rm $(SERVER_IMAGE)
+	CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -o date-agent cmd/register/main.go
+	cp cmd/register/Dockerfile . && docker build -t $(SERVER_IMAGE) .
+	rm -f Dockerfile && rm -f date-agent
+	docker push $(SERVER_IMAGE)
+
 proto:
 	cd proto && protoc --go_out=plugins=grpc:. *.proto
 
@@ -15,3 +26,4 @@ client:
 
 os:
 	go run cmd/client-env-retry/main.go -v=4
+

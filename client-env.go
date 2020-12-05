@@ -19,7 +19,7 @@ func NewClientByEnv() {
 			}
 			select {
 			case <-client.DoneSignal():
-				klog.Info("client.DoneSigna shutdown due to error")
+				klog.Info("client.DoneSignal shutdown due to error")
 			}
 		}
 	} else {
