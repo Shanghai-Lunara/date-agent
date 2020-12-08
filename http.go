@@ -49,7 +49,7 @@ func InitHttp(addr string, hub *Hub) *http.Server {
 		c.JSONP(http.StatusOK, gin.H{"tasks": hub.tasks[l:], "ret": hub.ret})
 	})
 
-	router.GET("/index", func(c *gin.Context) {
+	router.GET("/", func(c *gin.Context) {
 		c.HTML(http.StatusOK, "index.tmpl", gin.H{})
 	})
 
