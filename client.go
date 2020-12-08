@@ -53,7 +53,7 @@ func NewClient(addr string) (*Client, error) {
 	}
 	cc, err := grpc.Dial(addr, grpc.WithInsecure(), grpc.WithUnaryInterceptor(retry.UnaryClientInterceptor(opts...)))
 	if err != nil {
-		klog.V(2).Info(err)
+		klog.V(5).Info(err)
 		return nil, err
 	}
 	c.client = pb.NewDateAgentClient(cc)
@@ -99,7 +99,7 @@ func (c *Client) register() {
 		retry.WithMax(3),
 		retry.WithPerRetryTimeout(1*time.Second),
 	); err != nil {
-		klog.V(2).Info(err)
+		klog.V(5).Info(err)
 	}
 }
 
@@ -113,10 +113,10 @@ func (c *Client) task() (err error) {
 		retry.WithMax(3),
 		retry.WithPerRetryTimeout(1*time.Second),
 	); err != nil {
-		klog.V(2).Info(err)
+		klog.V(5).Info(err)
 		return err
 	}
-	klog.V(3).Info("reply:", reply)
+	klog.V(5).Info("reply:", reply)
 	if reply.Task.TaskId == 0 || c.currentTaskId >= reply.Task.TaskId {
 		return nil
 	}
@@ -126,7 +126,7 @@ func (c *Client) task() (err error) {
 	}
 	var out string
 	if out, err = Exec(reply.Task.Command); err != nil {
-		klog.V(2).Info(err)
+		klog.V(5).Info(err)
 		return err
 	}
 	if _, err = c.client.CompleteTask(
@@ -135,7 +135,7 @@ func (c *Client) task() (err error) {
 		retry.WithMax(3),
 		retry.WithPerRetryTimeout(1*time.Second),
 	); err != nil {
-		klog.V(2).Info(err)
+		klog.V(5).Info(err)
 		return err
 	}
 	return nil

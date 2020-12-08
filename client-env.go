@@ -14,12 +14,12 @@ func NewClientByEnv() {
 			client, err := NewClient(svc)
 			if err != nil {
 				time.Sleep(time.Second * 10)
-				klog.V(2).Infof("agent.NewClient err:%v", err)
+				klog.V(5).Infof("agent.NewClient err:%v", err)
 				continue
 			}
 			select {
 			case <-client.DoneSignal():
-				klog.Info("client.DoneSignal shutdown due to error")
+				klog.V(6).Info("client.DoneSignal shutdown due to error")
 			}
 		}
 	} else {
