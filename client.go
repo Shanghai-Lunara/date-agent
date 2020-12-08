@@ -39,8 +39,6 @@ func NewClient(addr string) (*Client, error) {
 	if err != nil {
 		klog.Fatal(err)
 	}
-
-	hostname = fmt.Sprintf("%s%d", hostname, time.Now().Unix())
 	ctx, cancel := context.WithCancel(context.Background())
 	c := &Client{
 		hostname:      hostname,
