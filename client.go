@@ -2,7 +2,6 @@ package date_agent
 
 import (
 	"context"
-	"fmt"
 	pb "github.com/Shanghai-Lunara/date-agent/proto"
 	"github.com/golang/protobuf/ptypes"
 	retry "github.com/grpc-ecosystem/go-grpc-middleware/retry"
@@ -105,7 +104,6 @@ func (c *Client) register() {
 
 func (c *Client) task() (err error) {
 	var reply *pb.PullTaskReply
-	fmt.Println(c.hostname)
 
 	if reply, err = c.client.PullTask(
 		context.Background(),
