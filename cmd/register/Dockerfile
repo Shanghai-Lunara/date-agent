@@ -1,6 +1,6 @@
 FROM ubuntu:18.04
 
-LABEL maintainer="1024769485@qq.com"
+LABEL maintainer="lunara-developer@lunara.net"
 
 WORKDIR /server/
 COPY date-agent /server/
