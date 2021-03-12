@@ -1,5 +1,5 @@
 # date-agent
-An agent which was deployed for scheduling or syncing commands between different mechines、 containers or k8s pods
+An agent which was deployed for scheduling or syncing commands between different mechines or k8s pod containers
 
 ## Run register server
 ```sh
