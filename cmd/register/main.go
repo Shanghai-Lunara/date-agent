@@ -3,7 +3,8 @@ package main
 import (
 	"flag"
 	agent "github.com/Shanghai-Lunara/date-agent"
-	"github.com/nevercase/k8s-controller-custom-resource/pkg/signals"
+	"github.com/TyrandeCloud/signals/pkg/signals"
+
 	"k8s.io/klog/v2"
 )
 

@@ -1,11 +1,10 @@
 .PHONY: proto register client
 
-HARBOR_DOMAIN := $(shell echo ${HARBOR})
-PROJECT := lunara-common
-SERVER_IMAGE := "$(HARBOR_DOMAIN)/$(PROJECT)/date-agent:latest"
+DOMAIN := $(shell echo ${DOCKER_REGISTRY_DOMAIN})
+PROJECT := $(shell echo ${DOCKER_REGISTRY_PROJECT})
+SERVER_IMAGE := "$(DOMAIN)/$(PROJECT)/date-agent:latest"
 
 build:
-	-i docker image rm $(SERVER_IMAGE)
 	CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -o date-agent cmd/register/main.go
 	cp cmd/register/Dockerfile . && docker build -t $(SERVER_IMAGE) .
 	rm -f Dockerfile && rm -f date-agent

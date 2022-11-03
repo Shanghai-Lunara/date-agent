@@ -1,6 +1,4 @@
-FROM ubuntu:18.04
-
-LABEL maintainer="lunara-developer@lunara.net"
+FROM ubuntu:20.04
 
 WORKDIR /server/
 COPY date-agent /server/
