@@ -101,8 +101,7 @@ var app = {
         const minute = Number(app.changeMins.value)? Number(app.changeMins.value) : 0
         const changeTime = day*24*60 + hour*60 + minute
         const cmd = `date -d '${type}${changeTime}' minute +%Y-%m-%d %H:%M:%S`
-        console.log('cmd', cmd)
-        // app.saveJob(cmd)
+        app.saveJob(cmd)
     },
     /*newJob: function(){
        for(var i = 0; i < app.inputs.length; i++){
@@ -179,9 +178,9 @@ var app = {
         }
     },
     getResponse: function () {
-        // setInterval(function () {
-        //     app.ajax('post', '/getHub')
-        // }, 200);
+        setInterval(function () {
+            app.ajax('post', '/getHub')
+        }, 200);
     },
     getDate: function () {
         var date = new Date(new Date().getTime());//如果date为13位不需要乘1000
