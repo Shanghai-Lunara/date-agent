@@ -42,9 +42,14 @@ var app = {
     jobs: $('#body table tbody')[0],
     logs: $('#log')[0],
     modalModify: $('#modify')[0],
-    inputs: $('.body form input, .body form select, .test input'),
-    change: $('.change input')[0],
+    // inputs: $('.body form input, .body form select, .test input'),
+    // change: $('.change input')[0],
     resetValue: $('.reset input')[0],
+    changeType: $('#changeType')[0],
+    changeHours: $('#changeHours')[0],
+    changeDays: $('#changeDays')[0],
+    changeMins: $('#changeMins')[0],
+    changeHoursBtn: $('#changeHoursBtn')[0],
     editing: undefined,
     taskId: 0,
     init: function () {
@@ -53,8 +58,9 @@ var app = {
         app.getJobs();
         // app.new.on('click', app.newJob);
         app.close.on('click', app.closeModify);
-        app.save.on('click', app.changeCommand);
+        // app.save.on('click', app.changeCommand);
         app.reset.on('click', app.resetCommand);
+        app.changeHoursBtn.on('click', app.changeHoursCommand);
         // app.del.on('click', app.delJob);
 
         app.closeModify();
@@ -86,8 +92,17 @@ var app = {
         }*/
         app.openModify();
     },
-    changeCommand: function(){app.saveJob(app.change.value)},
+    // changeCommand: function(){app.saveJob(app.change.value)},
     resetCommand: function() {app.saveJob(app.resetValue.value)},
+    changeHoursCommand: function() {
+        const type = app.changeType.value==='+' ? '%2B' : '-'
+        const day = Number(app.changeDays.value)? Number(app.changeDays.value) : 0
+        const hour = Number(app.changeHours.value)? Number(app.changeHours.value) : 0
+        const minute = Number(app.changeMins.value)? Number(app.changeMins.value) : 0
+        const changeTime = day*24*60 + hour*60 + minute
+        const cmd = `date -d '${type}${changeTime}' minute +%Y-%m-%d %H:%M:%S`
+        app.saveJob(cmd)
+    },
     /*newJob: function(){
        for(var i = 0; i < app.inputs.length; i++){
           app.inputs[i].value = "";
@@ -101,6 +116,7 @@ var app = {
         // editing[app.inputs[i].getAttribute('name')] = app.inputs[i].value;
         // let body = 'hostname=' + app.data.rows[app.editing]['hostname'] + '&command=' + app.inputs[i].value
         let body = 'command=' + request
+        console.log('body', body)
         app.ajax('post', '/changeTime', body)
         // app.data.rows[app.getJobIndex(app.editing)] = editing;
         // app.closeModify();
@@ -136,7 +152,7 @@ var app = {
                     const tasks = JSON.parse(xhr.responseText).tasks;
                     if (url == '/getHub') {
                         let template = '';
-                        Object.keys(tasks).forEach(function (key) {
+                        Object.keys(tasks)?.forEach(function (key) {
                             let tmp = tasks[key]
                                 app.taskId = tmp.id
                                 template += `
@@ -147,6 +163,7 @@ var app = {
                     }
 
                     data.rows = []
+                    if(ret)
                     Object.keys(ret).forEach(function (key) {
                         let tmp = {
                             hostname: key,

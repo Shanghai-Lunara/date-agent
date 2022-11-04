@@ -14,9 +14,24 @@
   <div class="header">Date-agent</div>
   <div class="header" style="height: auto">
     <div class="test">
-      <label class="change">输入指令:  <input type="text" name="name" style="margin-left: 5px"/>
-        <button id="save" style="float:right;">Change</button>
-      </label>
+        <label style="display: flex; justify-content: space-between;height: 50px;padding-top: 10px;" class="change">
+          <select id="changeType" style="background: #ccc;">
+            <option value ="+">前进</option>
+            <option value ="-">后退</option>
+          </select>
+            <input type="text" id="changeDays" name="name" style="margin-left: 5px"/>days
+            <input type="text" id="changeHours" name="name" style="margin-left: 5px"/>hours
+            <input type="text" id="changeMins" name="name" style="margin-left: 5px"/>minites
+          <button id="changeHoursBtn" >Change</button>
+        </label>
+    </div>
+    <div class="test">
+    <!--
+          <label class="change">输入指令:  <input type="text" name="name" style="margin-left: 5px"/>
+            <button id="save" style="float:right;">Change</button>
+          </label>
+    -->
+
       <label class="reset">还原指令:  <input type="text" name="name" value="ntpdate cn.pool.ntp.org" style="margin-left: 5px"/>
         <button class="bg-red" style="float:right;" id="reset">Reset</button>
       </label>
