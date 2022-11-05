@@ -9,6 +9,7 @@ build:
 	cp cmd/register/Dockerfile . && docker build -t $(SERVER_IMAGE) .
 	rm -f Dockerfile && rm -f date-agent
 	docker push $(SERVER_IMAGE)
+	bash hack/guldan.sh cli $(PROJECT) date-agent latest
 
 proto:
 	cd proto && protoc --go_out=plugins=grpc:. *.proto
@@ -27,5 +28,9 @@ os:
 	go run cmd/client-env-retry/main.go -v=4
 
 build-client:
-	CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -o date-agent-client cmd/client-env-retry/main.go
+	#CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -o date-agent-client cmd/client-env-retry/main.go
+	cp cmd/hang/Dockerfile . &
+	docker build -t local-date-agent-build:latest .
+	rm -f Dockerfile
+
 
