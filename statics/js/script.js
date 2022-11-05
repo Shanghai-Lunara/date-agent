@@ -58,7 +58,7 @@ var app = {
         app.getJobs();
         // app.new.on('click', app.newJob);
         app.close.on('click', app.closeModify);
-        // app.save.on('click', app.changeCommand);
+        app.save.on('click', app.changeCommand);
         app.reset.on('click', app.resetCommand);
         app.changeHoursBtn.on('click', app.changeHoursCommand);
         // app.del.on('click', app.delJob);
@@ -92,7 +92,7 @@ var app = {
         }*/
         app.openModify();
     },
-    // changeCommand: function(){app.saveJob(app.change.value)},
+    changeCommand: function(){app.saveJob('date')},
     resetCommand: function() {app.saveJob(app.resetValue.value)},
     changeHoursCommand: function() {
         const type = app.changeType.value==='+' ? '+' : '-'
