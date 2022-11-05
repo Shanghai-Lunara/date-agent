@@ -95,13 +95,13 @@ var app = {
     // changeCommand: function(){app.saveJob(app.change.value)},
     resetCommand: function() {app.saveJob(app.resetValue.value)},
     changeHoursCommand: function() {
-        const type = app.changeType.value==='+' ? '%2B' : '-'
+        const type = app.changeType.value==='+' ? '+' : '-'
         const day = Number(app.changeDays.value)? Number(app.changeDays.value) : 0
         const hour = Number(app.changeHours.value)? Number(app.changeHours.value) : 0
         const minute = Number(app.changeMins.value)? Number(app.changeMins.value) : 0
         const changeTime = day*24*60 + hour*60 + minute
         const cmd = `date -d '${type}${changeTime}' minute +%Y-%m-%d %H:%M:%S`
-        app.saveJob(cmd)
+        app.saveJob(encodeURIComponent(cmd))
     },
     /*newJob: function(){
        for(var i = 0; i < app.inputs.length; i++){
@@ -116,7 +116,7 @@ var app = {
         // editing[app.inputs[i].getAttribute('name')] = app.inputs[i].value;
         // let body = 'hostname=' + app.data.rows[app.editing]['hostname'] + '&command=' + app.inputs[i].value
         let body = 'command=' + request
-        console.log('body', body)
+        console.log('body2', body)
         app.ajax('post', '/changeTime', body)
         // app.data.rows[app.getJobIndex(app.editing)] = editing;
         // app.closeModify();
